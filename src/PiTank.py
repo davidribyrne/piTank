@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import cherrypy
 import RPi.GPIO as gpio
 import os, os.path
@@ -20,7 +21,8 @@ gpio.setup(16, gpio.OUT)
 gpio.setup(18, gpio.OUT)
 
 
-cherrypy.config.update({'server.socket_port': 9000})
+cherrypy.config.update({'server.socket_host': '0.0.0.0',
+                        'server.socket_port': 80})
 WebSocketPlugin(cherrypy.engine).subscribe()
 cherrypy.tools.websocket = WebSocketTool()
 
