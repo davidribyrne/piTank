@@ -1,7 +1,21 @@
 //alert('loaded');
-/*
-var socket = new WebSocket("ws://127.0.0.1:9000/ws");
+'use strict';
 
+var FORWARD = 'FORWARD';
+var LEFT = 'LEFT';
+var RIGHT = 'RIGHT';
+var REVERSE = 'REVERSE';
+var STOP = 'STOP';
+
+
+var Command = 
+{
+	leftMotor: '',
+	rightMotor: ''
+}
+
+
+var socket = new WebSocket("ws://127.0.0.1:9000/ws");
 
 socket.onmessage = function(event)
 {
@@ -20,10 +34,9 @@ socket.onopen = function(event)
 
 socket.onclose = function(event)
 {
-	alert('Connection lost');
+	alert('Connection lost. Refresh Page.');
 }
 
-*/
 
   var nativeLogOutput = document.getElementById('native-hold');
   var kdLogOutput = document.getElementById('kd-hold');
@@ -36,11 +49,6 @@ socket.onclose = function(event)
     outputEl.innerHTML = '';
   }
 
-var FORWARD = 'FORWARD';
-var LEFT = 'LEFT';
-var RIGHT = 'RIGHT';
-var BACK = 'BACK';
-var STOP = 'STOP';
 
 var currentState = STOP;
 function getState()
@@ -48,26 +56,31 @@ function getState()
 	var state = '';
 	if (kd.UP.isDown())
 	{
-		state += FORWARD;
+		state += ':' + FORWARD;
 	}
 	else if (kd.DOWN.isDown())
 	{
-		state += BACK;
+		state += ':' + BACK;
 	}
 
 	if (kd.LEFT.isDown())
 	{
-		state += LEFT;
+		state += ':' + LEFT;
 	}
 	if (kd.RIGHT.isDown())
 	{
-		state += RIGHT;
+		state += ':' + RIGHT;
 	}
 	if (state.length == 0)
 	{
 		state = STOP;
 	}
 	return state;
+}
+
+function sendState()
+{
+	
 }
 
 function handleState()
