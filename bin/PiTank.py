@@ -106,8 +106,8 @@ if __name__ == '__main__':
     
     cherrypy.config.update({'server.socket_host': '0.0.0.0',
                             'server.socket_port': 80,
-                            'log.access_file': './logs/access',
-                            'log.error_file': './logs/error'
+                            'log.access_file': './log/access',
+                            'log.error_file': './log/error'
                             })
     WebSocketPlugin(cherrypy.engine).subscribe()
     cherrypy.tools.websocket = WebSocketTool()
