@@ -152,11 +152,6 @@ function generateCommand(clientState)
 	return state;
 }
 
-function sendCommand()
-{
-	
-}
-
 function handleKeyChange()
 {
 	if (socket.readyState == WebSocket.OPEN)
