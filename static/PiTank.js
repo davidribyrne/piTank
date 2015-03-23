@@ -194,7 +194,7 @@ function initializeKD()
 var DEBUG = document.getElementById('logDebug');
 var KEY_STATUS = document.getElementById('logStatus');
 var socket = createSocket();
-var currentClientState = new State();
+var currentClientState = new ClientState();
 
 initializeKD();
 
