@@ -1,0 +1,68 @@
+pin 6 on pi ( ground)
+to 
+ground on controler
+
+negative on bat pack 
+to
+ground on controller
+
+pin 2 on pi
+to
++5v on controller
+
+CONTROLER:
+ena - both pins to high to enable motor
+enb
+input1 
+input2
+input3
+input4
+
+input 1 off & input 2  on, motor A spins
+input 1 on & input 2 off, motor A spins other way
+
+jumper on ena OR
+	ena (either pin) 
+	to
+	pin 7 on pi (GPIO 4)
+
+	ena (other pin)
+	to 
+	pin 11 on pi (GPIO 17)
+
+input 1
+to
+pin 13 on pi (GPIO 21)
+
+
+input 2
+to
+pin 15 on pi (GPIO 22)
+
+import RPi.GPIO as gpio
+import time
+gpio.setmode(gpio.BOARD)
+gpio.setup(7, gpio.OUT)
+gpio.setup(11, gpio.OUT)
+gpio.setup(13, gpio.OUT)
+gpio.setup(15, gpio.OUT)
+
+gpio.output(7, True)
+gpio.output(11, True)
+
+while True:
+    gpio.output(13, True)
+    gpio.output(15, False)
+    time.sleep(2)
+    gpio.output(13, False)
+    gpio.output(15, True)
+    time.sleep(2)
+    gpio.output(13, False)
+
+
+left motor
+pins 13 & 15
+
+
+right motor
+pins 16 & 18

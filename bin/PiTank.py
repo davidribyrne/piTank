@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import json
 import cherrypy
 import RPi.GPIO as gpio
 import os, os.path
@@ -14,18 +15,12 @@ LEFT_MOTOR_PIN_B = 13
 RIGHT_MOTOR_PIN_A = 16
 RIGHT_MOTOR_PIN_B = 18
 
-gpio.setmode(gpio.BOARD)
-gpio.setup(13, gpio.OUT)
-gpio.setup(15, gpio.OUT)
-gpio.setup(16, gpio.OUT)
-gpio.setup(18, gpio.OUT)
 
-
-cherrypy.config.update({'server.socket_host': '0.0.0.0',
-                        'server.socket_port': 80})
-WebSocketPlugin(cherrypy.engine).subscribe()
-cherrypy.tools.websocket = WebSocketTool()
-
+class DeviceState:
+    def __init__(self):
+        self.leftMotor = STOP
+        self.rightMotor = STOP
+        
 
 
 def leftMotor(direction):
@@ -53,21 +48,37 @@ def rightMotor(direction):
     gpio.output(RIGHT_MOTOR_PIN_A, PIN_A)
     gpio.output(RIGHT_MOTOR_PIN_B, PIN_B)
     
+def processCommand(command):
+    if command.leftMotor != state.leftMotor:
+        leftMotor(command.leftMotor)
+    if command.rightMotor != state.rightMotor:
+        rightMotor(command.leftMotor)
+        
 
-
-class PiTank(object):
+class WebServer(object):
     @cherrypy.expose
     def index(self):
         return """
-        <html><title>PiTank</title>
+        <html><title>PiTank Main Menu</title>
+        <body>
+            <a href="keyboard">Keyboard interface</a><br/>
+        </body></html>
+        """
+
+    @cherrypy.expose
+    def keyboard(self):
+        return """
+        <html><title>PiTank Keyboard Interface</title>
         <body>
             <b>PiTank</b><br/>
-            <div id="kd-hold" class="log-output"></div>
+            <div id="logStatus"></div><br/>
+            <div id="logDebug"></div><br/>
 
             <script src="/static/keydrown.js"></script>
             <script src="/static/PiTank.js"></script>
         </body></html>
         """
+
 
     @cherrypy.expose
     def ws(self):
@@ -80,10 +91,25 @@ class PiTank(object):
     
 class CommandSocket(WebSocket):
     def received_message(self, message):
-        
-        self.send(message.data, message.is_binary)
+        processCommand(json.load(message.data))
+        #self.send(message.data, message.is_binary)
 
 if __name__ == '__main__':
+    gpio.setmode(gpio.BOARD)
+
+    gpio.setup(LEFT_MOTOR_PIN_A, gpio.OUT)
+    gpio.setup(LEFT_MOTOR_PIN_B, gpio.OUT)
+    gpio.setup(RIGHT_MOTOR_PIN_A, gpio.OUT)
+    gpio.setup(RIGHT_MOTOR_PIN_B, gpio.OUT)
+    
+    state = DeviceState()
+    
+    cherrypy.config.update({'server.socket_host': '0.0.0.0',
+                            'server.socket_port': 80})
+    WebSocketPlugin(cherrypy.engine).subscribe()
+    cherrypy.tools.websocket = WebSocketTool()
+
+    
     conf = {
          '/ws': {
              'tools.websocket.on': True,
@@ -98,4 +124,4 @@ if __name__ == '__main__':
              'tools.staticdir.dir': './static'
          }
      }
-    cherrypy.quickstart(PiTank(), '/', conf)
+    cherrypy.quickstart(WebServer(), '/', conf)
